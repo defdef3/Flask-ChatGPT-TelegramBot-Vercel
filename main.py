@@ -14,11 +14,11 @@ import openai
 openai.api_key = os.getenv("OPENAI_API_KEY") 
 
 
-chat_language = os.getenv("INIT_LANGUAGE", default = "zh") #amend here to change your preset language
+chat_language = os.getenv("INIT_LANGUAGE", default = "ru") #amend here to change your preset language
 	
 MSG_LIST_LIMIT = int(os.getenv("MSG_LIST_LIMIT", default = 20))
 LANGUAGE_TABLE = {
-	  "zh": "哈囉！",
+	  "ru": "Привет！",
 	  "en": "Hello!",
       "jp": "こんにちは"
 	}
@@ -43,7 +43,7 @@ class Prompts:
 class ChatGPT:  
     def __init__(self):
         self.prompt = Prompts()
-        self.model = os.getenv("OPENAI_MODEL", default = "text-davinci-003")
+        self.model = os.getenv("OPENAI_MODEL", default = "gpt-3.5-turbo")
         self.temperature = float(os.getenv("OPENAI_TEMPERATURE", default = 0))
         self.frequency_penalty = float(os.getenv("OPENAI_FREQUENCY_PENALTY", default = 0))
         self.presence_penalty = float(os.getenv("OPENAI_PRESENCE_PENALTY", default = 0.6))
@@ -59,10 +59,10 @@ class ChatGPT:
 	            max_tokens=self.max_tokens
                 )
         
-        print("AI回答內容：")        
+        print("ChatGPT：")        
         print(response['choices'][0]['text'].strip())
 
-        print("AI原始回覆資料內容：")      
+        print("ChatGPT：")      
         print(response)
         
         return response['choices'][0]['text'].strip()
