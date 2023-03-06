@@ -33,7 +33,7 @@ class ChatGPT:
 
         response = openai.ChatCompletion.create(
 	            model=self.model,
-		temperature=0.5,
+		temperature=2,
                 messages = self.messages
 
                 )
