@@ -23,7 +23,7 @@ class ChatGPT:
     def __init__(self):
         
         self.messages = conversation
-        self.model = os.getenv("OPENAI_MODEL", default = "gpt-3.5-turbo")
+        self.model = os.getenv("OPENAI_MODEL", default = "text-davinci-003")
 
 
 
@@ -39,7 +39,7 @@ class ChatGPT:
 
         conversation.append({"role": "assistant", "content": response['choices'][0]['message']['content']})
         
-        print("AI：")        
+        print("AI1：")        
         print(response['choices'][0]['message']['content'].strip())
 
 
