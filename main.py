@@ -13,41 +13,62 @@ import openai
 	
 openai.api_key = os.getenv("OPENAI_API_KEY") 
 
+
 chat_language = os.getenv("INIT_LANGUAGE", default = "zh") #amend here to change your preset language
 	
-conversation = []
+MSG_LIST_LIMIT = int(os.getenv("MSG_LIST_LIMIT", default = 20))
+LANGUAGE_TABLE = {
+	  "zh": "哈囉！",
+	  "en": "Hello!",
+      "jp": "こんにちは"
+	}
 
-class ChatGPT:  
-    
 
+class Prompts:
     def __init__(self):
-        
-        self.messages = conversation
-        self.model = os.getenv("OPENAI_MODEL", default = "gpt-3.5-turbo-0301")
-	self.temperature = float(0)
-
-
-    def get_response(self, user_input):
-        conversation.append({"role": "user", "content": user_input})
-        
-
-        response = openai.ChatCompletion.create(
-	            model=self.model,
-	            temperature=self.temperature,
-		    messages = self.messages
-
-                )
-
-        conversation.append({"role": "assistant", "content": response['choices'][0]['message']['content']})
-        
-        print("AI1：")        
-        print(response['choices'][0]['message']['content'].strip())
-
-
-        
-        return response['choices'][0]['message']['content'].strip()
+        self.msg_list = []
+        self.msg_list.append(f"AI:{LANGUAGE_TABLE[chat_language]}")
+	    
+    def add_msg(self, new_msg):
+        if len(self.msg_list) >= MSG_LIST_LIMIT:
+            self.remove_msg()
+        self.msg_list.append(new_msg)
 	
+    def remove_msg(self):
+        self.msg_list.pop(0)
+	
+    def generate_prompt(self):
+        return '\n'.join(self.msg_list)	
+	
+class ChatGPT:  
+    def __init__(self):
+        self.prompt = Prompts()
+        self.model = os.getenv("OPENAI_MODEL", default = "gpt-3.5-turbo-0301")
+        self.temperature = float(os.getenv("OPENAI_TEMPERATURE", default = 0))
+        self.frequency_penalty = float(os.getenv("OPENAI_FREQUENCY_PENALTY", default = 0))
+        self.presence_penalty = float(os.getenv("OPENAI_PRESENCE_PENALTY", default = 0.6))
+        self.max_tokens = int(os.getenv("OPENAI_MAX_TOKENS", default = 240))
+	
+    def get_response(self):
+        response = openai.Completion.create(
+	            model=self.model,
+	            prompt=self.prompt.generate_prompt(),
+	            temperature=self.temperature,
+	            frequency_penalty=self.frequency_penalty,
+	            presence_penalty=self.presence_penalty,
+	            max_tokens=self.max_tokens
+                )
+        
+        print("AI回答內容：")        
+        print(response['choices'][0]['text'].strip())
 
+        print("AI原始回覆資料內容：")      
+        print(response)
+        
+        return response['choices'][0]['text'].strip()
+	
+    def add_msg(self, text):
+        self.prompt.add_msg(text)
 
 
 
@@ -65,9 +86,9 @@ telegram_bot_token = str(os.getenv("TELEGRAM_BOT_TOKEN"))
 #config.read('config.ini')
 
 # Enable logging
-#logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-#                    level=logging.INFO)
-#logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Initial Flask app
 app = Flask(__name__)
@@ -94,8 +115,8 @@ def reply_handler(bot, update):
     #update.message.reply_text(text)
     chatgpt = ChatGPT()        
     
-                                            #update.message.text 人類的問題 the question humans asked
-    ai_reply_response = chatgpt.get_response(update.message.text) #ChatGPT產生的回答 the answers that ChatGPT gave
+    chatgpt.prompt.add_msg(update.message.text) #人類的問題 the question humans asked
+    ai_reply_response = chatgpt.get_response() #ChatGPT產生的回答 the answers that ChatGPT gave
     
     update.message.reply_text(ai_reply_response) #用AI的文字回傳 reply the text that AI made
 
