@@ -24,7 +24,7 @@ class ChatGPT:
         
         self.messages = conversation
         self.model = os.getenv("OPENAI_MODEL", default = "gpt-3.5-turbo-0301")
-	self.temperature = float(os.getenv("OPENAI_TEMPERATURE", default = 2))
+	self.temperature = float(os.getenv("OPENAI_TEMPERATURE", default = 0))
 
 
     def get_response(self, user_input):
@@ -33,7 +33,7 @@ class ChatGPT:
 
         response = openai.ChatCompletion.create(
 	            model=self.model,
-		temperature=self.temperature,
+	            temperature=self.temperature,
 		    messages = self.messages
 
                 )
