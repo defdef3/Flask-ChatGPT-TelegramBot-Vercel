@@ -33,6 +33,7 @@ class ChatGPT:
 
         response = openai.ChatCompletion.create(
 	            model=self.model,
+		temperature=self.temperature,
                 messages = self.messages
 
                 )
@@ -64,9 +65,9 @@ telegram_bot_token = str(os.getenv("TELEGRAM_BOT_TOKEN"))
 #config.read('config.ini')
 
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
-logger = logging.getLogger(__name__)
+#logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+#                    level=logging.INFO)
+#logger = logging.getLogger(__name__)
 
 # Initial Flask app
 app = Flask(__name__)
