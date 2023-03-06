@@ -23,7 +23,8 @@ class ChatGPT:
     def __init__(self):
         
         self.messages = conversation
-        self.model = os.getenv("OPENAI_MODEL", default = "gpt-3.5-turbo")
+        self.model = os.getenv("OPENAI_MODEL", default = "gpt-3.5-turbo-0301")
+	self.temperature = float(os.getenv("OPENAI_TEMPERATURE", default = 2))
 
 
 
